@@ -1,0 +1,4 @@
+[{<<"epbkdf2">>,
+  {git,"https://github.com/aeternity/epbkdf2",
+       {ref,"38a2c730fdbe250f0adf198ea4bd24352dd5b223"}},
+  0}].

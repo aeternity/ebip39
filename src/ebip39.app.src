@@ -1,0 +1,10 @@
+{application, ebip39,
+ [{description, "Implementing BIP-0039 Mnemonics"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env,[]},
+  {modules, [ebip39]},
+  {licenses, ["ISC"]},
+  {links, []}
+ ]}.
