@@ -58,7 +58,25 @@ ix_table() ->
 
 read_wordlist() ->
   File = filename:join(code:priv_dir(ebip39), ?WORDLIST),
-  {ok, BinData} = file:read_file(File),
+  case file:read_file(File) of
+    {ok, BinData} ->
+      read_wordlist(BinData);
+    {error, enotdir} -> %% In escript?
+      try
+        Escript        = escript:script_name(),
+        {ok, Sections} = escript:extract(Escript, []),
+        Archive        = proplists:get_value(archive, Sections),
+        FileName       = filename:join([ebip39, priv, ?WORDLIST]),
+        case zip:extract(Archive, [{file_list, [FileName]}, memory]) of
+          {ok, [{_, BinData}]} -> read_wordlist(BinData);
+          _                    -> error(wordlist_not_found)
+        end
+      catch _E:_R:_S ->
+        error(wordlist_not_found)
+      end
+  end.
+
+read_wordlist(BinData) ->
   Words = string:lexemes(BinData, "\n"),
   2048 = length(Words),
   Words.
