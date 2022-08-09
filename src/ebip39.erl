@@ -36,8 +36,8 @@ validate_mnemonic(Mnemonic) ->
   Ixs   = [ maps:get(W, Table) || W <- string:lexemes(Mnemonic, " ") ],
   Size  = length(Ixs) * 11,
   CSize = Size rem 32,
-  SSize = Size - CSize,
-  <<Seed:(SSize div 8)/bytes, CS:(CSize)>> = << <<Ix:11>> || Ix <- Ixs >>,
+  SSize = (Size - CSize) div 8,
+  <<Seed:SSize/bytes, CS:(CSize)>> = << <<Ix:11>> || Ix <- Ixs >>,
   case crypto:hash(sha256, Seed) of
     <<CS:(CSize), _/bitstring>> -> ok;
     _                           -> {error, checksum_error}
