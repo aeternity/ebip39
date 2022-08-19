@@ -1,0 +1,40 @@
+version: 2.1
+
+executors:
+  aebuilder:
+    docker:
+      - image: aeternity/builder:bionic-otp24
+        user: builder
+    working_directory: ~/ebip39
+
+jobs:
+  verify_rebar_lock:
+    executor: aebuilder
+    steps:
+      - checkout
+      - run:
+          name: Ensure lock file is up-to-date
+          command: |
+            rebar3 upgrade
+            git diff --quiet -- rebar.lock || (echo "rebar.lock is not up-to-date" && exit 1)
+  build:
+    executor: aebuilder
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: rebar3 compile
+      - run:
+          name: Static Analysis
+          command: rebar3 dialyzer
+      - run:
+          name: EUnit
+          command: rebar3 eunit
+
+workflows:
+  version: 2
+  build_test:
+    jobs:
+      - build
+      - verify_rebar_lock
+
